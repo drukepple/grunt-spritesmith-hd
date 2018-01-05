@@ -1,0 +1,75 @@
+{
+  // Default options
+  'functions': true
+}
+
+@import "{{{options.hdPath}}}";
+
+{{#items}}
+${{../options.varPrefix}}{{name}}-x: {{px.x}};
+${{../options.varPrefix}}{{name}}-y: {{px.y}};
+${{../options.varPrefix}}{{name}}-offset-x: {{px.offset_x}};
+${{../options.varPrefix}}{{name}}-offset-y: {{px.offset_y}};
+${{../options.varPrefix}}{{name}}-width: {{px.width}};
+${{../options.varPrefix}}{{name}}-height: {{px.height}};
+${{../options.varPrefix}}{{name}}-total-width: {{px.total_width}};
+${{../options.varPrefix}}{{name}}-total-height: {{px.total_height}};
+${{../options.varPrefix}}{{name}}-image: '{{{escaped_image}}}';
+${{../options.varPrefix}}{{name}}-hd: ${{../options.varPrefix}}{{../options.hdPrefix}}-{{name}};
+${{../options.varPrefix}}{{name}}: {{px.x}} {{px.y}} {{px.offset_x}} {{px.offset_y}} {{px.width}} {{px.height}} {{px.total_width}} {{px.total_height}} '{{{escaped_image}}}' ${{../options.varPrefix}}{{../options.hdPrefix}}-{{name}};
+{{/items}}
+
+
+
+{{#options.createMap}}
+${{options.varPrefix}}sprite-map: (
+  {{#items}}
+    {{../options.varPrefix}}{{name}}: {{px.x}} {{px.y}} {{px.offset_x}} {{px.offset_y}} {{px.width}} {{px.height}} {{px.total_width}} {{px.total_height}} '{{{escaped_image}}}' ${{../options.varPrefix}}{{../options.hdPrefix}}-{{name}},
+  {{/items}}
+);
+{{/options.createMap}}
+
+
+
+{{#options.functions}}
+@mixin sprite-width($sprite) {
+  width: nth($sprite, 5);
+}
+
+@mixin sprite-height($sprite) {
+  height: nth($sprite, 6);
+}
+
+@mixin sprite-position($sprite) {
+  $sprite-offset-x: nth($sprite, 3);
+  $sprite-offset-y: nth($sprite, 4);
+  background-position: $sprite-offset-x  $sprite-offset-y;
+}
+
+@mixin sprite-image($sprite) {
+  background-image: url(nth($sprite, 9));
+}
+
+@mixin sprite-hd($sprite) {
+  @if (length($sprite) == 10) {
+    $hd-variable: nth($sprite, 10);
+    $sprite-total-width: nth($hd-variable, 7) / 2;
+    $sprite-total-height: nth($hd-variable, 8) / 2;
+    @media (-o-min-device-pixel-ratio: 5/4),
+           (-webkit-min-device-pixel-ratio: 1.25),
+           (min-resolution: 120dpi) {
+      @include sprite-image($hd-variable);
+      background-size: $sprite-total-width $sprite-total-height;
+    }
+  }
+}
+
+@mixin sprite($sprite) {
+  @include sprite-image($sprite);
+  @include sprite-position($sprite);
+  @include sprite-width($sprite);
+  @include sprite-height($sprite);
+  @include sprite-hd($sprite);
+}
+
+{{/options.functions}}
